@@ -2,6 +2,26 @@
     <head>
         <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs@3.13.0/dist/tf.min.js"></script>
         <script>
+            function getSize() {
+                const m = document.URL.match(/(\d+)x(\d+)/)
+                if (m) {
+                    return {
+                        width: parseInt(m[1]),
+                        height: parseInt(m[2]),
+                    }
+                }
+                return {
+                    width: 320,
+                    height: 240,
+                }
+            }
+            function getColor() {
+                const m = document.URL.match(/(\d+),(\d+),(\d+)/)
+                if (m) {
+                    return m[0]
+                }
+                return '0,255,0'
+            }
             async function main() {
                 tf.setBackend('webgl');
                 console.log(tf.getBackend());
@@ -9,8 +29,9 @@
                 const canvas = document.querySelector('canvas');
                 const select = document.querySelector('select');
 
-                video.width = 320;
-                video.height = 240;
+                const { width, height } = getSize()
+                video.width = width;
+                video.height = height;
                 const webcam = await tf.data.webcam(video);
                 const model = await tf.loadGraphModel('model/model.json');
 
@@ -30,28 +51,8 @@
                         ['fgr', 'pha', 'r1o', 'r2o', 'r3o', 'r4o']   // select outputs
                     );
 
-                    // Draw the result based on selected view
-                    const viewOption = select.value;
-                    if (viewOption === 'recurrent1') {
-                        drawHidden(r1o, canvas);
-                    } else if (viewOption === 'recurrent2') {
-                        drawHidden(r2o, canvas);
-                    } else if (viewOption === 'recurrent3') {
-                        drawHidden(r3o, canvas);
-                    } else if (viewOption === 'recurrent4') {
-                        drawHidden(r4o, canvas);
-                    } else if (viewOption === 'white') {
-                        drawMatte(fgr.clone(), pha.clone(), canvas);
-                        canvas.style.background = 'rgb(255, 255, 255)';
-                    } else if (viewOption === 'green') {
-                        drawMatte(fgr.clone(), pha.clone(), canvas);
-                        canvas.style.background = 'rgb(0, 255, 0)';
-                    } else if (viewOption === 'alpha') {
-                        drawMatte(null, pha.clone(), canvas);
-                        canvas.style.background = 'rgb(0, 0, 0)';
-                    } else if (viewOption === 'foreground') {
-                        drawMatte(fgr.clone(), null, canvas);
-                    }
+                    drawMatte(fgr.clone(), pha.clone(), canvas);
+                    canvas.style.background = 'rgb(' + getColor() + ')';
 
                     // Dispose old tensors.
                     tf.dispose([img, src, fgr, pha, r1i, r2i, r3i, r4i]);
@@ -61,9 +62,6 @@
                     window.requestAnimationFrame(step)
                 }
                 window.requestAnimationFrame(step)
-                // while (true) {
-                //     await step()
-                // }
             }
 
             async function drawMatte(fgr, pha, canvas){
@@ -115,22 +113,13 @@
             video {
                 display: none;
             }
+            body {
+                margin: 0;
+            }
         </style>
     </head>
     <body>
         <video></video>
         <canvas></canvas>
-        <div>
-            <select>
-                <option value="green">Green Background</option>
-                <option value="white">White Background</option>
-                <option value="alpha">Alpha</option>
-                <option value="foreground">Foreground</option>
-                <option value="recurrent1">Recurrent State 1</option>
-                <option value="recurrent2">Recurrent State 2</option>
-                <option value="recurrent3">Recurrent State 3</option>
-                <option value="recurrent4">Recurrent State 4</option>
-            </select>
-        </div>
     </body>
 </html>

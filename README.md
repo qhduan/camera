@@ -1,3 +1,15 @@
-# TensorFlow.js Starter Code
+# Camera for OBS
 
-This branch contains a starter example for using our model in TensorFlow.js. Clone this branch and serve it locally. The index.html presents similar functionality as our official [web demo](https://peterl1n.github.io/RobustVideoMatting/#/demo) but without fancy UI.
+Based on [https://github.com/PeterL1n/RobustVideoMatting/tree/tfjs](https://github.com/PeterL1n/RobustVideoMatting/tree/tfjs)
+
+Change size, bigger is slower, default is 320x240:
+
+https://qhduan.github.io/camera/#size=480x320
+
+Change background color:
+
+https://qhduan.github.io/camera/#color=255,0,0
+
+Change size and background color:
+
+https://qhduan.github.io/camera/#size=480x320&color=255,0,0
